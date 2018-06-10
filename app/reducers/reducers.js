@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { RECEIVE_CARDS, RECEIVE_DECK, REQUEST_CARDS, REQUEST_DECK, FLIP } from '../actions/actions';
+import { RECEIVE_CARDS, RECEIVE_DECK, REQUEST_CARDS, REQUEST_DECK, FLIP, MATCH } from '../actions/actions';
 
 function deck(
 	state = {
@@ -26,6 +26,9 @@ function cards(
 	state = {
 		isLoading: true,
 		cards: [],
+		turns: 0,
+		matched: false,
+		pair: false,
 	},
 	action,
 ) {
@@ -39,31 +42,74 @@ function cards(
 				isLoading: false,
 				cards: action.cards,
 			});
-		default:
-			return state;
-	}
-}
-
-function flip(
-	state = {
-		flipped: false,
-	},
-	action,
-) {
-	switch (action.type) {
 		case FLIP:
 			return Object.assign({}, state, {
-				flipped: true,
+				cards: state.cards.map((card, index) => {
+					if (index === action.id) {
+						return Object.assign({}, card, {
+							flipped: !card.flipped,
+						});
+					}
+					return card;
+				}),
 			});
 		default:
 			return state;
 	}
 }
+function match(
+	state = {
+		cards: [],
+		turns: 0,
+		matched: false,
+		pair: false,
+	},
+	action,
+) {
+	switch (action.type) {
+		case RECEIVE_CARDS:
+			return Object.assign({}, state, {
+				isLoading: false,
+				cards: action.cards,
+			});
+		case MATCH: {
+			let newState;
+			if (state.pair) {
+				if (state.cards[state.cardId].code === state.cards[action.id].code) {
+					newState = Object.assign({}, state, {
+						id: action.id,
+						cardId: state.cardId,
+						matched: 'matched',
+						turns: state.turns + 1,
+						pair: false,
+					});
+				} else {
+					newState = Object.assign({}, state, {
+						id: action.id,
+						cardId: state.cardId,
+						matched: 'fail',
+						turns: state.turns + 1,
+						pair: false,
+					});
+				}
+			} else {
+				newState = Object.assign({}, state, {
+					cardId: action.id,
+					pair: true,
+				});
+			}
+			return newState;
+		}
+		default:
+			return state;
+	}
+}
+
 
 const rootReducer = combineReducers({
 	deck,
 	cards,
-	flip,
+	match,
 });
 
 export default rootReducer;

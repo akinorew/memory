@@ -7,6 +7,7 @@ export const RECEIVE_DECK = 'RECEIVE_DECK';
 export const REQUEST_CARDS = 'REQUEST_CARDS';
 export const RECEIVE_CARDS = 'RECEIVE_CARDS';
 export const FLIP = 'FLIP';
+export const MATCH = 'MATCH';
 
 function requestDeck() {
 	return {
@@ -18,7 +19,6 @@ function receiveDeck(json) {
 	return {
 		type: RECEIVE_DECK,
 		deck: json,
-		receivedAt: Date.now(),
 	};
 }
 
@@ -34,7 +34,6 @@ function receiveCards(id, json) {
 		type: RECEIVE_CARDS,
 		id,
 		cards: json.cards.concat(_.shuffle(json.cards)),
-		receivedAt: Date.now(),
 	};
 }
 
@@ -61,9 +60,13 @@ export function fetchDeck() {
 	};
 }
 
-export function flip(id) {
-	return {
-		type: FLIP,
-		payload: id,
-	};
-}
+export const flip = id => ({
+	type: FLIP,
+	id,
+});
+
+export const match = (card, id) => ({
+	type: MATCH,
+	id,
+	card,
+});
