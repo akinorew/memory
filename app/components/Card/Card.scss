@@ -1,0 +1,61 @@
+.card {
+	cursor: pointer;
+	perspective: 1000px;
+	width: 8rem;
+	height: 10rem;
+	margin: 0.2rem 0.2rem;
+	border-radius: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	outline: none;
+
+	img {
+		width: 8rem;
+		height: 10rem;
+	}
+
+	.front {
+		background-color: #87CEFA;
+	}
+
+	&--flipped &__flipper {
+		transform: rotateY(180deg);
+	}
+
+	&__flipper {
+		transition: 0.6s;
+		transform-style: preserve-3d;
+
+		position: relative;
+
+		perspective: 1000px;
+		width: 8rem;
+		height: 10rem;
+		border-radius: 5px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+	}
+
+	.front,
+	.back {
+		backface-visibility: hidden;
+
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 8rem;
+		height: 10rem;
+	}
+
+	.front {
+		z-index: 2;
+		transform: rotateY(0deg);
+	}
+
+	.back {
+		transform: rotateY(180deg);
+	}
+}

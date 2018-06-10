@@ -1,44 +1,55 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import React from 'react';
+import Card from './../Card/Card';
+import {
+	fetchDeck,
+	flip,
+} from '../../actions/actions';
 
 require('./App.css');
 
 class App extends React.Component {
 	static propTypes = {
-		myProp: PropTypes.string.isRequired,
+		cards: PropTypes.arrayOf().isRequired,
+		fetchDeck: PropTypes.func.isRequired,
+		flip: PropTypes.func.isRequired,
 	};
 
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			time: new Date(),
-		};
-
-		this.timer = null;
-	}
-
 	componentDidMount() {
-		this.timer = setInterval(() => {
-			this.setState({ time: new Date() });
-		}, 1000);
-	}
-
-	componentWillUnmount() {
-		this.timer = clearInterval(this.timer);
+		this.props.fetchDeck();
 	}
 
 	render() {
+		const { cards } = this.props;
+
 		return (
 			<div>
-				<h1>Hello World</h1>
-
-				<p>The time is <b>{this.state.time.toString()}</b></p>
-
-				<p>My prop value: {this.props.myProp}</p>
+				{cards.isLoading && <h2>Loading...</h2>}
+				{!cards.isLoading &&
+				<div className="deck">
+					{cards.cards.map((card, index) => (
+						<Card id={index} {...card} onClick={() => this.props.flip(index)} />
+					))}
+				</div>}
 			</div>
 		);
 	}
 }
 
-export default App;
+function mapStateToProps(state) {
+	return {
+		deck: state.deck,
+		cards: state.cards,
+	};
+}
+
+// Which action creators does it want to receive by props?
+function mapDispatchToProps(dispatch) {
+	return {
+		fetchDeck: () => dispatch(fetchDeck()),
+		flip: id => dispatch(flip(id)),
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
