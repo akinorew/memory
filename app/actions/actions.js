@@ -9,6 +9,7 @@ export const RECEIVE_CARDS = 'RECEIVE_CARDS';
 export const FLIP = 'FLIP';
 export const MATCH = 'MATCH';
 export const RESET = 'RESET';
+export const SAVE = 'SAVE';
 
 function requestDeck() {
 	return {
@@ -61,6 +62,32 @@ export function fetchDeck() {
 			.then((json) => {
 				dispatch(receiveDeck(json));
 				dispatch(fetchCards(json.deck_id));
+			})
+			.then(error => console.log(error));
+	};
+}
+
+function saveScore() {
+	return {
+		type: SAVE,
+	};
+}
+
+export function save(name, score) {
+	return (dispatch) => {
+		dispatch(saveScore());
+		return fetch('http://localhost:8000/save', {
+			method: 'POST',
+			body: JSON.stringify({
+				name,
+				score,
+			}),
+			mode: 'cors',
+			headers: { 'Access-Control-Allow-Origin': '*' },
+		})
+			.then(response => response.json())
+			.then((json) => {
+				console.log('success', json);
 			})
 			.then(error => console.log(error));
 	};

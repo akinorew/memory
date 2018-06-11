@@ -17,6 +17,7 @@
     "babel-runtime": "6.26.0",
     "cross-fetch": "2.2.1",
     "hapi": "17.2.0",
+    "hapi-cors-headers": "1.0.3",
     "lodash": "4.17.10",
     "prop-types": "15.6.0",
     "react": "16.2.0",

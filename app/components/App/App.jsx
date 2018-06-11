@@ -6,7 +6,7 @@ import {
 	fetchDeck,
 	flip,
 	match,
-	reset,
+	save,
 } from '../../actions/actions';
 import Modal from '../Modal/Modal';
 
@@ -23,7 +23,7 @@ class App extends React.Component {
 		match: PropTypes.func.isRequired,
 		turns: PropTypes.number.isRequired,
 		matched: PropTypes.string.isRequired,
-		reset: PropTypes.func.isRequired,
+		save: PropTypes.func.isRequired,
 		score: PropTypes.number.isRequired,
 		success: PropTypes.bool.isRequired,
 	};
@@ -38,6 +38,7 @@ class App extends React.Component {
 		this.onClick = this.onClick.bind(this);
 		this.closeModal = this.closeModal.bind(this);
 		this.play = this.play.bind(this);
+		this.save = this.save.bind(this);
 	}
 
 	componentDidMount() {
@@ -104,6 +105,11 @@ class App extends React.Component {
 
 		this.props.fetchDeck();
 	}
+
+	save(name) {
+		this.props.save(name, this.props.turns);
+	}
+
 	render() {
 		const { cards, turns } = this.props;
 
@@ -132,7 +138,7 @@ class App extends React.Component {
 					}
 				</div>
 				<div className="outlet">
-					<Modal show={this.state.success} onClose={this.closeModal} />
+					<Modal show={this.state.success} onClose={this.closeModal} onSave={this.save} />
 				</div>
 			</div>
 		);
@@ -158,7 +164,7 @@ function mapDispatchToProps(dispatch) {
 		fetchDeck: () => dispatch(fetchDeck()),
 		flip: id => dispatch(flip(id)),
 		match: (card, id) => dispatch(match(card, id)),
-		reset: () => dispatch(reset()),
+		save: (name, score) => dispatch(save(name, score)),
 	};
 }
 

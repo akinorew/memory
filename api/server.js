@@ -13,6 +13,12 @@ server.route({
 	handler: () => 'Nothing to see here',
 });
 
+server.route({
+	method: 'POST',
+	path: '/save',
+	handler: (request, reply) => reply('hello'),
+});
+
 server
 	.start()
 	.then(() => {
