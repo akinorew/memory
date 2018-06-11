@@ -13,3 +13,11 @@ Run the following commands:
 3. `yarn install`
 
 To start the application you can now run: `yarn start`
+
+## Missing because of lack of time:
+- saving high score list
+- unit tests
+- documentation in swagger
+
+## Features
+- slider to change the difficulty of the game
