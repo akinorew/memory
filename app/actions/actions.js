@@ -8,6 +8,7 @@ export const REQUEST_CARDS = 'REQUEST_CARDS';
 export const RECEIVE_CARDS = 'RECEIVE_CARDS';
 export const FLIP = 'FLIP';
 export const MATCH = 'MATCH';
+export const RESET = 'RESET';
 
 function requestDeck() {
 	return {
@@ -33,22 +34,27 @@ function receiveCards(id, json) {
 	return {
 		type: RECEIVE_CARDS,
 		id,
-		cards: json.cards.concat(_.shuffle(json.cards)),
+		cards: _.shuffle(json.cards.concat((json.cards))),
 	};
 }
 
 function fetchCards(deckId) {
 	return (dispatch) => {
 		dispatch(requestCards(deckId));
-		return fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=6`)
+		return fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=2`)
 			.then(response => response.json())
 			.then(json => dispatch(receiveCards(deckId, json)))
 			.then(error => console.log(error));
 	};
 }
 
+const reset = () => ({
+	type: RESET,
+});
+
 export function fetchDeck() {
 	return (dispatch) => {
+		dispatch(reset());
 		dispatch(requestDeck());
 		return fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
 			.then(response => response.json())

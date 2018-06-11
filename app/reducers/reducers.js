@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { RECEIVE_CARDS, RECEIVE_DECK, REQUEST_CARDS, REQUEST_DECK, FLIP, MATCH } from '../actions/actions';
+import { RECEIVE_CARDS, RECEIVE_DECK, REQUEST_CARDS, REQUEST_DECK, FLIP, MATCH, RESET } from '../actions/actions';
 
 function deck(
 	state = {
@@ -63,6 +63,7 @@ function match(
 		turns: 0,
 		matched: false,
 		pair: false,
+		score: 0,
 	},
 	action,
 ) {
@@ -82,6 +83,7 @@ function match(
 						matched: 'matched',
 						turns: state.turns + 1,
 						pair: false,
+						score: state.score + 1,
 					});
 				} else {
 					newState = Object.assign({}, state, {
@@ -100,11 +102,20 @@ function match(
 			}
 			return newState;
 		}
+		case RESET:
+			return Object.assign({}, state, {
+				cardId: null,
+				cards: [],
+				id: null,
+				turns: 0,
+				matched: false,
+				pair: false,
+				score: 0,
+			});
 		default:
 			return state;
 	}
 }
-
 
 const rootReducer = combineReducers({
 	deck,

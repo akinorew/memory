@@ -6,26 +6,38 @@ import {
 	fetchDeck,
 	flip,
 	match,
+	reset,
 } from '../../actions/actions';
+import Modal from '../Modal/Modal';
 
-require('./App.css');
+require('./App.scss');
 
 class App extends React.Component {
 	static propTypes = {
 		cardId: PropTypes.number.isRequired,
 		cards: PropTypes.arrayOf().isRequired,
+		deck: PropTypes.objectOf().isRequired,
 		fetchDeck: PropTypes.func.isRequired,
 		flip: PropTypes.func.isRequired,
 		id: PropTypes.number.isRequired,
 		match: PropTypes.func.isRequired,
 		turns: PropTypes.number.isRequired,
 		matched: PropTypes.string.isRequired,
+		reset: PropTypes.func.isRequired,
+		score: PropTypes.number.isRequired,
+		success: PropTypes.bool.isRequired,
 	};
 
 	constructor(props) {
 		super(props);
 
+		this.state = {
+			locked: false,
+		};
+
 		this.onClick = this.onClick.bind(this);
+		this.closeModal = this.closeModal.bind(this);
+		this.play = this.play.bind(this);
 	}
 
 	componentDidMount() {
@@ -33,54 +45,95 @@ class App extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (this.state && this.state.checking) {
-			if (nextProps.matched === 'matched') {
-				console.log('success');
-			} else if (nextProps.matched === 'fail') {
-				setTimeout(() => {
+		if (!this.props.deck.isLoadingDeck && !nextProps.deck.isLoadingDeck &&
+			!this.props.cards.isLoading && !nextProps.cards.isLoading) {
+			if (nextProps.score === this.props.cards.cards.length / 2) {
+				this.setState({
+					success: true,
+				});
+			}
+
+			if (this.state && this.state.checking) {
+				this.setState({
+					locked: true,
+				});
+				if (nextProps.matched === 'matched') {
 					this.setState({
-						checking: false,
+						locked: false,
 					});
-					this.props.flip(this.props.id);
-					this.props.flip(this.props.cardId);
-				}, 1000);
+				} else if (nextProps.matched === 'fail') {
+					setTimeout(() => {
+						this.setState({
+							checking: false,
+						});
+						this.props.flip(this.props.id);
+						this.props.flip(this.props.cardId);
+
+						this.setState({
+							locked: false,
+						});
+					}, 1000);
+				}
 			}
 		}
 	}
 
 	onClick(id, card) {
-		this.props.flip(id);
-		this.props.match(card, id);
+		if (!this.state.locked) {
+			this.props.flip(id);
+			this.props.match(card, id);
 
+			this.setState({
+				checking: true,
+			});
+		}
+	}
+
+	closeModal() {
 		this.setState({
-			checking: true,
+			locked: true,
+			success: false,
 		});
 	}
 
+	play() {
+		this.setState({
+			checking: false,
+			locked: false,
+		});
+
+		this.props.fetchDeck();
+	}
 	render() {
-		const { cards, turns, matched } = this.props;
+		const { cards, turns } = this.props;
 
 		return (
 			<div>
-				<div>Matched {matched}</div>
-				{cards.isLoading && <h2>Loading...</h2>}
-				{!cards.isLoading &&
-				<div>
-					<button>Play / Shuffle</button>
-					<span>Turns so far: {turns}</span>
-					<div className="deck">
-						{cards.cards.map((card, index) => (
-							<Card
-								id={index}
-								{...card}
-								image={card.image}
-								flipped={card.flipped}
-								onClick={() => this.onClick(index, card)}
-							/>
-						))}
+				<div className="game">
+					{cards.isLoading && <h2>Loading...</h2>}
+					{!cards.isLoading &&
+					<div>
+						<div className="game__header">
+							<button onClick={() => this.play()}>Play / Shuffle</button>
+							<span className="game__turns">Turns so far: {turns}</span>
+						</div>
+						<div className="game__deck">
+							{cards.cards.map((card, index) => (
+								<Card
+									id={index}
+									{...card}
+									image={card.image}
+									flipped={card.flipped}
+									onClick={() => this.onClick(index, card)}
+								/>
+							))}
+						</div>
 					</div>
+					}
 				</div>
-				}
+				<div className="outlet">
+					<Modal show={this.state.success} onClose={this.closeModal} />
+				</div>
 			</div>
 		);
 	}
@@ -95,6 +148,7 @@ function mapStateToProps(state) {
 		id: state.match.id,
 		cardId: state.match.cardId,
 		pair: state.match.pair,
+		score: state.match.score,
 	};
 }
 
@@ -104,6 +158,7 @@ function mapDispatchToProps(dispatch) {
 		fetchDeck: () => dispatch(fetchDeck()),
 		flip: id => dispatch(flip(id)),
 		match: (card, id) => dispatch(match(card, id)),
+		reset: () => dispatch(reset()),
 	};
 }
 
