@@ -42,7 +42,7 @@ function receiveCards(id, json) {
 function fetchCards(deckId) {
 	return (dispatch) => {
 		dispatch(requestCards(deckId));
-		return fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=2`)
+		return fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=20`)
 			.then(response => response.json())
 			.then(json => dispatch(receiveCards(deckId, json)))
 			.then(error => console.log(error));
