@@ -5,6 +5,7 @@ import Card from './../Card/Card';
 import {
 	fetchDeck,
 	flip,
+	get,
 	match,
 	save,
 } from '../../actions/actions';
@@ -19,12 +20,14 @@ class App extends React.Component {
 		deck: PropTypes.objectOf().isRequired,
 		fetchDeck: PropTypes.func.isRequired,
 		flip: PropTypes.func.isRequired,
+		get: PropTypes.func.isRequired,
 		id: PropTypes.number.isRequired,
 		match: PropTypes.func.isRequired,
 		turns: PropTypes.number.isRequired,
 		matched: PropTypes.string.isRequired,
 		save: PropTypes.func.isRequired,
 		score: PropTypes.number.isRequired,
+		scores: PropTypes.arrayOf.isRequired,
 		success: PropTypes.bool.isRequired,
 	};
 
@@ -43,6 +46,7 @@ class App extends React.Component {
 
 	componentDidMount() {
 		this.props.fetchDeck();
+		this.props.get();
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -111,7 +115,7 @@ class App extends React.Component {
 	}
 
 	render() {
-		const { cards, turns } = this.props;
+		const { cards, turns, scores } = this.props;
 
 		return (
 			<div>
@@ -136,6 +140,16 @@ class App extends React.Component {
 						</div>
 					</div>
 					}
+					{scores && scores.length !== 0 &&
+						<div>
+							{scores.map(scoreRecord => (
+								<div className="game__scores">
+									<div className="game__scores-name">{scoreRecord.name}</div>
+									<div className="game__scores-score">{scoreRecord.score}</div>
+								</div>
+							))}
+						</div>
+					}
 				</div>
 				<div className="outlet">
 					<Modal show={this.state.success} onClose={this.closeModal} onSave={this.save} />
@@ -155,6 +169,7 @@ function mapStateToProps(state) {
 		cardId: state.match.cardId,
 		pair: state.match.pair,
 		score: state.match.score,
+		scores: state.get.scores,
 	};
 }
 
@@ -163,6 +178,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		fetchDeck: () => dispatch(fetchDeck()),
 		flip: id => dispatch(flip(id)),
+		get: () => dispatch(get()),
 		match: (card, id) => dispatch(match(card, id)),
 		save: (name, score) => dispatch(save(name, score)),
 	};

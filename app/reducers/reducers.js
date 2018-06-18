@@ -1,5 +1,8 @@
 import { combineReducers } from 'redux';
-import { RECEIVE_CARDS, RECEIVE_DECK, REQUEST_CARDS, REQUEST_DECK, FLIP, MATCH, RESET } from '../actions/actions';
+import {
+	RECEIVE_CARDS, RECEIVE_DECK, REQUEST_CARDS, REQUEST_DECK, FLIP, MATCH, RESET,
+	RECEIVE_SCORES,
+} from '../actions/actions';
 
 function deck(
 	state = {
@@ -117,9 +120,26 @@ function match(
 	}
 }
 
+function get(
+	state = {
+		scores: [],
+	},
+	action,
+) {
+	switch (action.type) {
+		case RECEIVE_SCORES:
+			return Object.assign({}, state, {
+				scores: action.scores,
+			});
+		default:
+			return state;
+	}
+}
+
 const rootReducer = combineReducers({
 	deck,
 	cards,
+	get,
 	match,
 });
 

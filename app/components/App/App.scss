@@ -18,6 +18,19 @@
 		padding: 1rem;
 	}
 
+	&__scores {
+		display: flex;
+		flex-direction: column;
+
+		&-name {
+			align-self: flex-start;
+		}
+
+		&-score {
+			align-self: flex-end;
+		}
+	}
+
 	&__turns {
 		float: right;
 	}

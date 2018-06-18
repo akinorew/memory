@@ -10,6 +10,8 @@ export const FLIP = 'FLIP';
 export const MATCH = 'MATCH';
 export const RESET = 'RESET';
 export const SAVE = 'SAVE';
+export const GET_SCORES = 'GET_SCORES';
+export const RECEIVE_SCORES = 'RECEIVE_SCORES';
 
 function requestDeck() {
 	return {
@@ -82,13 +84,36 @@ export function save(name, score) {
 				name,
 				score,
 			}),
-			mode: 'cors',
-			headers: { 'Access-Control-Allow-Origin': '*' },
 		})
 			.then(response => response.json())
 			.then((json) => {
 				console.log('success', json);
 			})
+			.then(error => console.log(error));
+	};
+}
+
+function getScores() {
+	return {
+		type: GET_SCORES,
+	};
+}
+
+function receiveScores(json) {
+	return {
+		type: RECEIVE_SCORES,
+		scores: json,
+	};
+}
+
+export function get() {
+	return (dispatch) => {
+		dispatch(getScores());
+		return fetch('http://localhost:8000/scores', {
+			method: 'GET',
+		})
+			.then(response => response.json())
+			.then(json => dispatch(receiveScores(json)))
 			.then(error => console.log(error));
 	};
 }
